@@ -22,6 +22,10 @@ else()
   list(APPEND time_SOURCES fsw/src/cfe_time_dispatch.c)
 endif()
 
+if (CFE_SIM_STEPPING)
+  list(APPEND time_SOURCES fsw/src/cfe_time_stepping.c)
+endif()
+
 add_library(time STATIC ${time_SOURCES})
 
 target_include_directories(time PUBLIC fsw/inc)
