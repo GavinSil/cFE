@@ -34,6 +34,7 @@
 #include "cfe_version.h"
 #include "cfe_config.h" /* For version string construction */
 #include "cfe_time_verify.h"
+#include "cfe_time_stepping.h"
 
 /*
 ** Time task global data...
@@ -92,6 +93,10 @@ void CFE_TIME_TaskMain(void)
     {
         /* Increment the Main task Execution Counter */
         CFE_ES_IncrementTaskCounter();
+
+#ifdef CFE_SIM_STEPPING
+        CFE_TIME_Stepping_Hook_TaskCycle();
+#endif
 
         CFE_ES_PerfLogExit(CFE_MISSION_TIME_MAIN_PERF_ID);
 
@@ -358,6 +363,10 @@ int32 CFE_TIME_ToneSignalCmd(const CFE_TIME_ToneSignalCmd_t *data)
     /*
     ** Indication that tone signal occurred recently...
     */
+#ifdef CFE_SIM_STEPPING
+    CFE_TIME_Stepping_Hook_ToneSignal();
+#endif
+
     CFE_TIME_ToneSignal();
 
     /*
@@ -401,6 +410,10 @@ int32 CFE_TIME_OneHzCmd(const CFE_TIME_OneHzCmd_t *data)
      * This task used to be performed as part of the 1Hz ISR, but this was unsafe on SMP
      * as the updates cannot be synchronized with the command handlers in this environment
      */
+#ifdef CFE_SIM_STEPPING
+    CFE_TIME_Stepping_Hook_1HzBoundary();
+#endif
+
     CFE_TIME_Local1HzStateMachine();
 
 #if (CFE_MISSION_TIME_CFG_FAKE_TONE == true)
