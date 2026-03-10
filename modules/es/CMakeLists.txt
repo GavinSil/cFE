@@ -38,6 +38,13 @@ add_library(es STATIC ${es_SOURCES})
 target_include_directories(es PUBLIC fsw/inc)
 target_link_libraries(es PRIVATE core_private)
 
+# When stepping is enabled, expose mission-owned neutral stepping ABI header
+if (CFE_SIM_STEPPING)
+    target_include_directories(es PRIVATE
+        ${MISSION_DEFS}/fsw/inc
+    )
+endif()
+
 # Add unit test coverage subdirectory
 if (ENABLE_UNIT_TESTS)
   add_subdirectory(ut-coverage)
