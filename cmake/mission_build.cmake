@@ -66,6 +66,7 @@ function(initialize_globals)
     # in the local environment.
     set(SIMULATION $ENV{SIMULATION} CACHE STRING "Enable simulation mode using specified toolchain")
     set(ENABLE_UNIT_TESTS $ENV{ENABLE_UNIT_TESTS} CACHE BOOL "Enable build of unit tests")
+    set(CFE_SIM_STEPPING $ENV{CFE_SIM_STEPPING} CACHE STRING "Enable simulation stepping mode for native simulation")
 
     # Export values to parent level
     set(MISSION_DEFS ${MISSION_SOURCE_DIR}/${MISSIONCONFIG}_defs CACHE PATH "Full path to mission definitions directory")
@@ -260,6 +261,7 @@ function(export_variable_cache USER_VARLIST)
     "MISSION_EDS_FILELIST"
     "MISSION_EDS_SCRIPTLIST"
     "ENABLE_UNIT_TESTS"
+    "CFE_SIM_STEPPING"
   )
 
   set(MISSION_VARCACHE)
@@ -621,6 +623,7 @@ function(process_arch TARGETSYSTEM)
         -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
         -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=${CMAKE_EXPORT_COMPILE_COMMANDS}
         -DCFE_EDS_ENABLED:BOOL=${CFE_EDS_ENABLED}
+        -DCFE_SIM_STEPPING=${CFE_SIM_STEPPING}
         ${SELECTED_TOOLCHAIN_FILE}
         ${CFE_SOURCE_DIR}
     WORKING_DIRECTORY

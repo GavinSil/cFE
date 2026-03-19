@@ -38,6 +38,13 @@ set(MISSION_CORE_MODULES
     "config"
 )
 
+if(CFE_SIM_STEPPING)
+    list(FIND MISSION_CORE_MODULES "psp" _psp_idx)
+    if (NOT _psp_idx EQUAL -1)
+        list(INSERT MISSION_CORE_MODULES ${_psp_idx} "esa")
+    endif()
+endif()
+
 # The "MISSION_GLOBAL_APPLIST" is a set of apps/libs that will be built
 # for every defined and target.  These are built as dynamic modules
 # and must be loaded explicitly via startup script or command.
@@ -66,6 +73,7 @@ set(MISSION_MODULE_SEARCH_PATH
 # of the standard search path.
 set(osal_SEARCH_PATH ".")
 set(psp_SEARCH_PATH ".")
+set(esa_SEARCH_PATH ".")
 
 # Account for differences when EDS is enabled
 if(CFE_EDS_ENABLED)
