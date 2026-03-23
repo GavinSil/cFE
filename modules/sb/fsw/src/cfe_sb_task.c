@@ -36,8 +36,16 @@
 
 #include <string.h>
 
+#ifdef CFE_SIM_STEPPING
+#include "esa_stepping_shim.h"
+#endif
+
 /*  Task Globals */
 CFE_SB_Global_t CFE_SB_Global;
+
+#ifdef CFE_SIM_STEPPING
+#define CFE_SB_SERVICE_ID 2
+#endif
 
 /* Local structure for file writing callbacks */
 typedef struct
@@ -107,8 +115,21 @@ void CFE_SB_TaskMain(void)
 
         if (Status == CFE_SUCCESS)
         {
+#ifdef CFE_SIM_STEPPING
+            ESA_Stepping_ShimEvent_t stepping_event = {0};
+            stepping_event.event_kind = ESA_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_RECEIVE;
+            stepping_event.entity_id  = CFE_SB_SERVICE_ID;
+            ESA_Stepping_Shim_ReportEvent(&stepping_event);
+#endif
+
             /* Process cmd pipe msg */
             CFE_SB_ProcessCmdPipePkt(SBBufPtr);
+
+#ifdef CFE_SIM_STEPPING
+            stepping_event.event_kind = ESA_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_COMPLETE;
+            stepping_event.entity_id  = CFE_SB_SERVICE_ID;
+            ESA_Stepping_Shim_ReportEvent(&stepping_event);
+#endif
         }
         else
         {

@@ -35,6 +35,10 @@
 
 #include <string.h>
 
+#ifdef CFE_SIM_STEPPING
+#include "esa_stepping_shim.h"
+#endif
+
 #include "cfe_es_resetdata_typedef.h" /* Definition of CFE_ES_ResetData_t */
 
 /* Global Data */
@@ -42,6 +46,10 @@ CFE_EVS_Global_t CFE_EVS_Global;
 
 /* Defines */
 #define CFE_EVS_PANIC_DELAY 500 /**< \brief Task delay before PSP panic */
+
+#ifdef CFE_SIM_STEPPING
+#define CFE_EVS_SERVICE_ID 1
+#endif
 
 /* Function Definitions */
 
@@ -231,8 +239,21 @@ void CFE_EVS_TaskMain(void)
 
         if (Status == CFE_SUCCESS)
         {
+#ifdef CFE_SIM_STEPPING
+            ESA_Stepping_ShimEvent_t stepping_event = {0};
+            stepping_event.event_kind = ESA_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_RECEIVE;
+            stepping_event.entity_id  = CFE_EVS_SERVICE_ID;
+            ESA_Stepping_Shim_ReportEvent(&stepping_event);
+#endif
+
             /* Process cmd pipe msg */
             CFE_EVS_ProcessCommandPacket(SBBufPtr);
+
+#ifdef CFE_SIM_STEPPING
+            stepping_event.event_kind = ESA_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_COMPLETE;
+            stepping_event.entity_id  = CFE_EVS_SERVICE_ID;
+            ESA_Stepping_Shim_ReportEvent(&stepping_event);
+#endif
         }
         else
         {

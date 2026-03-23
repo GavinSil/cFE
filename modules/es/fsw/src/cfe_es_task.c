@@ -45,7 +45,7 @@
 #include <assert.h>
 
 #ifdef CFE_SIM_STEPPING
-#include "cfe_psp_sim_stepping_shim.h"
+#include "esa_stepping_shim.h"
 #endif
 
 /*
@@ -63,7 +63,7 @@
     CFE_ES_PERF_MASK_ARRAY_SIZE(CFE_ES_Global.TaskData.HkPacket.Payload.PerfFilterMask)
 
 #ifdef CFE_SIM_STEPPING
-#define CFE_ES_SERVICE_ID 0x01
+#define CFE_ES_SERVICE_ID 0
 #endif
 
 enum
@@ -172,13 +172,19 @@ void CFE_ES_TaskMain(void)
         if (Status == CFE_SUCCESS)
         {
 #ifdef CFE_SIM_STEPPING
-            CFE_PSP_SimStepping_ShimEvent_t stepping_event = {0};
-            stepping_event.event_kind = CFE_PSP_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_RECEIVE;
+            ESA_Stepping_ShimEvent_t stepping_event = {0};
+            stepping_event.event_kind = ESA_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_RECEIVE;
             stepping_event.entity_id  = CFE_ES_SERVICE_ID;
-            CFE_PSP_SimStepping_Shim_ReportEvent(&stepping_event);
+            ESA_Stepping_Shim_ReportEvent(&stepping_event);
 #endif
 
             CFE_ES_TaskPipe(SBBufPtr);
+
+#ifdef CFE_SIM_STEPPING
+            stepping_event.event_kind = ESA_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_COMPLETE;
+            stepping_event.entity_id  = CFE_ES_SERVICE_ID;
+            ESA_Stepping_Shim_ReportEvent(&stepping_event);
+#endif
 
             /*
              * Wake up the background task, which includes the
