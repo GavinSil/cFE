@@ -29,41 +29,62 @@
 
 #ifdef CFE_SIM_STEPPING
 
+#include "esa_stepping_shim.h"
+#include "esa_stepping_core.h"
+
 /****************************************************************************************
-                                  STEPPING HOOK IMPLEMENTATIONS
+                                   STEPPING HOOK IMPLEMENTATIONS
  ***************************************************************************************/
 
 /**
- * @brief Hook called at each TIME task cycle
+ * @brief TIME 任务循环边界 hook
  *
- * Stub implementation called once per TIME task main loop iteration.
- * Real implementations can use this to gate task cycle execution.
+ * 薄转发器：在 TIME 主任务循环每次迭代开始时上报事件至统一 stepping shim。
+ * 该事件标记 TIME 服务任务的调度周期边界。
+ * Shim 将此事件转发到核心状态机进行 stepping 同步。
  */
 void CFE_TIME_Stepping_Hook_TaskCycle(void)
 {
-    /* Stub implementation - no-op */
+    ESA_Stepping_ShimEvent_t event = {0};
+
+    event.event_kind = ESA_SIM_STEPPING_EVENT_TIME_TASK_CYCLE;
+    event.entity_id  = ESA_SIM_STEPPING_SERVICE_BIT_TIME;
+
+    ESA_Stepping_Shim_ReportEvent(&event);
 }
 
 /**
- * @brief Hook called at 1Hz boundary transitions
+ * @brief 1Hz 边界转换 hook
  *
- * Stub implementation called when the TIME module processes 1Hz boundary state machine updates.
- * Real implementations can use this to gate 1Hz synchronization points.
+ * 薄转发器：在 TIME 模块执行 1Hz 边界状态机更新时上报事件至统一 stepping shim。
+ * 该事件标记本地 1Hz 同步点，用于协调周期性定时边界。
+ * Shim 将此事件转发到核心状态机进行 stepping 同步。
  */
 void CFE_TIME_Stepping_Hook_1HzBoundary(void)
 {
-    /* Stub implementation - no-op */
+    ESA_Stepping_ShimEvent_t event = {0};
+
+    event.event_kind = ESA_SIM_STEPPING_EVENT_1HZ_BOUNDARY;
+    event.entity_id  = ESA_SIM_STEPPING_CHILDPATH_BIT_TIME_LOCAL_1HZ;
+
+    ESA_Stepping_Shim_ReportEvent(&event);
 }
 
 /**
- * @brief Hook called when processing tone signal
+ * @brief Tone 信号处理 hook
  *
- * Stub implementation called when the TIME module processes a tone signal command.
- * Real implementations can use this to gate tone signal synchronization.
+ * 薄转发器：在 TIME 模块处理 tone 信号命令时上报事件至统一 stepping shim。
+ * 该事件标记时间同步 tone 信号边界，用于协调硬件/软件时间同步点。
+ * Shim 将此事件转发到核心状态机进行 stepping 同步。
  */
 void CFE_TIME_Stepping_Hook_ToneSignal(void)
 {
-    /* Stub implementation - no-op */
+    ESA_Stepping_ShimEvent_t event = {0};
+
+    event.event_kind = ESA_SIM_STEPPING_EVENT_TONE_SIGNAL;
+    event.entity_id  = ESA_SIM_STEPPING_CHILDPATH_BIT_TIME_TONE;
+
+    ESA_Stepping_Shim_ReportEvent(&event);
 }
 
 #endif /* CFE_SIM_STEPPING */
