@@ -37,10 +37,18 @@
 
 #include <string.h>
 
+#ifdef CFE_SIM_STEPPING
+#include "esa_stepping_shim.h"
+#endif
+
 /*
 ** Table task global data
 */
 CFE_TBL_Global_t CFE_TBL_Global;
+
+#ifdef CFE_SIM_STEPPING
+#define CFE_TBL_SERVICE_ID 3
+#endif
 
 /*----------------------------------------------------------------
  *
@@ -88,8 +96,21 @@ void CFE_TBL_TaskMain(void)
 
         if (Status == CFE_SUCCESS)
         {
+#ifdef CFE_SIM_STEPPING
+            ESA_Stepping_ShimEvent_t stepping_event = {0};
+            stepping_event.event_kind = ESA_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_RECEIVE;
+            stepping_event.entity_id  = CFE_TBL_SERVICE_ID;
+            ESA_Stepping_Shim_ReportEvent(&stepping_event);
+#endif
+
             /* Process cmd pipe msg */
             CFE_TBL_TaskPipe(SBBufPtr);
+
+#ifdef CFE_SIM_STEPPING
+            stepping_event.event_kind = ESA_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_COMPLETE;
+            stepping_event.entity_id  = CFE_TBL_SERVICE_ID;
+            ESA_Stepping_Shim_ReportEvent(&stepping_event);
+#endif
         }
         else
         {
