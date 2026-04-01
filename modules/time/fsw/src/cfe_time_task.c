@@ -94,10 +94,6 @@ void CFE_TIME_TaskMain(void)
         /* Increment the Main task Execution Counter */
         CFE_ES_IncrementTaskCounter();
 
-#ifdef CFE_SIM_STEPPING
-        CFE_TIME_Stepping_Hook_TaskCycle();
-#endif
-
         CFE_ES_PerfLogExit(CFE_MISSION_TIME_MAIN_PERF_ID);
 
         /* Pend on receipt of packet */

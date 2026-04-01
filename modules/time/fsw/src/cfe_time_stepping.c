@@ -37,23 +37,6 @@
  ***************************************************************************************/
 
 /**
- * @brief TIME 任务循环边界 hook
- *
- * 薄转发器：在 TIME 主任务循环每次迭代开始时上报事件至统一 stepping shim。
- * 该事件标记 TIME 服务任务的调度周期边界。
- * Shim 将此事件转发到核心状态机进行 stepping 同步。
- */
-void CFE_TIME_Stepping_Hook_TaskCycle(void)
-{
-    ESA_Stepping_ShimEvent_t event = {0};
-
-    event.event_kind = ESA_SIM_STEPPING_EVENT_TIME_TASK_CYCLE;
-    event.entity_id  = ESA_SIM_STEPPING_SERVICE_BIT_TIME;
-
-    ESA_Stepping_Shim_ReportEvent(&event);
-}
-
-/**
  * @brief 1Hz 边界转换 hook
  *
  * 薄转发器：在 TIME 模块执行 1Hz 边界状态机更新时上报事件至统一 stepping shim。

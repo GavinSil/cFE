@@ -38,16 +38,6 @@
 #ifdef CFE_SIM_STEPPING
 
 /**
- * @brief Hook called at each TIME task cycle
- *
- * This hook is called once per TIME task main loop iteration, allowing
- * stepping controllers to gate the task cycle execution.
- *
- * @note This should be implemented by stepping infrastructure if CFE_SIM_STEPPING is enabled
- */
-void CFE_TIME_Stepping_Hook_TaskCycle(void);
-
-/**
  * @brief Hook called at 1Hz boundary transitions
  *
  * This hook is called when the TIME module processes 1Hz boundary state machine updates,
@@ -70,7 +60,6 @@ void CFE_TIME_Stepping_Hook_ToneSignal(void);
 #else /* CFE_SIM_STEPPING not defined */
 
 /* No-op implementations when stepping is disabled */
-#define CFE_TIME_Stepping_Hook_TaskCycle()  ((void)0)
 #define CFE_TIME_Stepping_Hook_1HzBoundary() ((void)0)
 #define CFE_TIME_Stepping_Hook_ToneSignal()  ((void)0)
 
